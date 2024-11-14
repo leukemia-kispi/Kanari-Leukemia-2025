@@ -18,5 +18,5 @@ The graphs for the figures were created with the code found in figures_paper.R
 The graphs for the supplementary figures were created with the code found in suppl_figures_paper.R
 
 # Session and packages information
-The session info and packages information can be found here. 
+The session info and packages information can be found in the respective files. 
 
