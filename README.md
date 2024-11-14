@@ -5,12 +5,16 @@ This repository contains all the pre-processing, inegration, downstream analysis
 
 # Dataset composition
 The 3D data include leukemic, endothelial and mesenchymal stromal cells cultured in the Ectica plates. 
+
 The in vivo data include leukemic cells from NSG mice at full PDX engraftment.
 
 # Analysis 
 The procesing and integration and downstream analysis of the leukemic PDX data can be found in the leukemic_cells_paper.R
+
 The processing and downstream analysis of the mesenchymal stromal and endothelial cells can be found in the supporing_cells_paper.R
+
 The graphs for the figures were created with the code found in figures_paper.R
+
 The graphs for the supplementary figures were created with the code found in suppl_figures_paper.R
 
 # Session and packages information
