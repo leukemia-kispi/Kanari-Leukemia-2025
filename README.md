@@ -9,14 +9,14 @@ The 3D data include leukemic, endothelial and mesenchymal stromal cells cultured
 The in vivo data include leukemic cells from NSG mice at full PDX engraftment.
 
 # Analysis 
-The procesing and integration and downstream analysis of the leukemic PDX data can be found in the leukemic_cells_paper.R
+The procesing and integration and downstream analysis of the leukemic PDX data can be found in the [leukemic_cells_paper.R](https://github.com/mkanari/scRNAseq_analysis/blob/main/leukemia_cells_paper.R)
 
-The processing and downstream analysis of the mesenchymal stromal and endothelial cells can be found in the supporing_cells_paper.R
+The processing and downstream analysis of the mesenchymal stromal and endothelial cells can be found in the [supporing_cells_paper.R](https://github.com/mkanari/scRNAseq_analysis/blob/main/supporting_cells_paper.R)
 
 The graphs for the figures were created with the code found in [figures_paper.R](https://github.com/mkanari/scRNAseq_analysis/blob/b5ee7778aeaca6fc446d70967c4ce65cea1f90a6/figures_paper.R) 
 
-The graphs for the supplementary figures were created with the code found in suppl_figures_paper.R
-
+The graphs for the supplementary figures were created with the code found in [suppl_figures_paper.R
+](https://github.com/mkanari/scRNAseq_analysis/blob/main/suppl_figures_paper.R)
 # Session and packages information
-The session info and packages information can be found in the respective files. 
+The [session info](https://github.com/mkanari/scRNAseq_analysis/blob/main/session_info.md) and [packages information](https://github.com/mkanari/scRNAseq_analysis/blob/main/installed_packages.csv) can be found in the respective files. 
 
