@@ -18,30 +18,22 @@ dirs2 <- list.dirs("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/ECTICA_sc
 dirs3 <- list.dirs("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/in_vivo/", recursive = FALSE, full.names = FALSE)
 
 for(name in dirs1){
-  
   cts1 <- Read10X(data.dir = paste0("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/ECTICA_scRNAseq/Leukemic/co/", name, "/"))
-  
   assign(name, CreateSeuratObject(counts = cts1, 
                                   min.cells = 3, 
                                   min.features = 200))}
-
 for(name in dirs2){
-  
   cts2 <- Read10X(data.dir = paste0("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/ECTICA_scRNAseq/Leukemic/mono/", name, "/"))
-  
   assign(name, CreateSeuratObject(counts = cts2, 
                                   min.cells = 3, 
                                   min.features = 200))}
-
 for(name in dirs3){
-  
   cts3 <- Read10X(data.dir = paste0("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/in_vivo/", name, "/"))
-  
   assign(name, CreateSeuratObject(counts = cts3[["Gene Expression"]], 
                                   min.cells = 3, 
                                   min.features = 200))}
 
-# assign correct identities
+# assign correct identities (co, mono, invivo) for the seurat objects
 seurat_objects <- c(paste0("co", 1:6), paste0("mono", 1:6), paste0("IN_VIVO", 1:6))
 for (object_name in seurat_objects) {
   obj <- get(object_name)
@@ -69,7 +61,6 @@ for (object_name in seurat_objects) {
   obj <- FindClusters(obj)
   set.seed(42)
   obj <- RunUMAP(obj, dims = 1:20)
-  
   assign(object_name, obj)}
 
 # doublet finder for each sample  ----
@@ -78,7 +69,7 @@ doublet_rates <- c(CO1 = 0.054, CO2 = 0.046, CO3 = 0.039, CO4 = 0.046, CO5 = 0.0
                    MONO1 = 0.039, MONO2 = 0.004, MONO3 = 0.016, MONO4 = 0.031, MONO5 = 0.069, MONO6 = 0.039,
                    IN_VIVO_1 = 0.004, IN_VIVO_2 = 0.008, IN_VIVO_3 = 0.004, IN_VIVO_4 = 0.008, IN_VIVO_5 = 0.008, IN_VIVO_6 = 0.023)
 
-# Calculate independently for each sample - CHANGE SEURAT OBJECT and  DOUBLET RATE
+# Calculate independently for each sample - CHANGE SEURAT OBJECT and DOUBLET RATE
 # check correct sample name (eg. CO2)
 sweep.res.list <- paramSweep_v3(CO2, PCs = 1:20, sct = FALSE)
 sweep.stats <- summarizeSweep(sweep.res.list, GT = FALSE)
@@ -93,7 +84,7 @@ pK <- as.numeric(as.character(pK[[1]]))
 # Homotypic Doublet Proportion Estimate
 annotations <- CO2@meta.data$seurat_clusters
 homotypic.prop <- modelHomotypic(annotations)
-# check doublet rate (eg. 0.048)
+# check doublet rate (eg. 0.048), calculated based on number of cells, defined in DoubletFinder
 nExp_poi <- round(0.048*nrow(CO2@meta.data))  
 nExp_poi.adj <- round(nExp_poi*(1-homotypic.prop))
 
@@ -110,7 +101,6 @@ for (object_name in seurat_objects) {
   obj <- CellCycleScoring(obj, s.features = s.genes, g2m.features = g2m.genes, set.ident = TRUE)
   assign(object_name, obj)}
 
- 
 ## merge seurat objects based on condition ----
 mono <- merge(MONO1, y = c(MONO2, MONO3, MONO4, MONO5, MONO6), 
               add.cell.ids = c("MONO1", "MONO2", "MONO3", "MONO4", "MONO5", "MONO6"), project = "mono")
@@ -125,7 +115,7 @@ invivo<- merge(IN_VIVO1, y = c(IN_VIVO2, IN_VIVO3, IN_VIVO4, IN_VIVO5, IN_VIVO6)
 # saveRDS(invivo, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono/co_mono_invivo(cmi)/invivo.rds")
 
 # merge ex vivo data together to remove any supporting cells from co-culture----
-co_mono<- merge(co, y = mono, add.cell.ids = c("co", "mono"), project = "co_mono")
+co_mono <- merge(co, y = mono, add.cell.ids = c("co", "mono"), project = "co_mono")
 # saveRDS(co_mono, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Doublets_excluded/rds.files/co_mono.rds")
 
 # run standard pipeline 
@@ -138,7 +128,7 @@ co_mono <- FindClusters(co_mono, resolution = 0.5)
 set.seed(42)
 co_mono <- RunUMAP(co_mono, dims = 1:20)
 
-# remove supporting cells
+# remove supporting cells based on expression of known markers (below)
 FeaturePlot(co_mono, features = c("CD19", "CD22", "CD7", "CD5", "CDH5", "ENG", "PECAM1", "MCAM", "CXCL12", "PDGFRB"))
 DimPlot(co_mono, reduction = "umap", label = TRUE)
 co_mono_Leu <- subset(x = co_mono, idents = c(4, 8, 13, 3, 10, 12), invert = TRUE)
@@ -216,18 +206,15 @@ cmi$experiment[grepl("^invivo", cmi$orig.ident)] <- "invivo"
 # integration
 # split the dataset into a list of two seurat objects based on experiment
 cmi.list <- SplitObject(cmi, split.by = c("experiment"))
-
 # normalize and identify variable features for each dataset independently
 cmi.list <- lapply(X = cmi.list, FUN = function(x) {
   x <- NormalizeData(x)
   x <- FindVariableFeatures(x, selection.method = "vst", nfeatures = 2000)})
-
 # select features that are repeatedly variable across datasets for integration run PCA 
 features <- SelectIntegrationFeatures(object.list = cmi.list)
 cmi.list <- lapply(X = cmi.list, FUN = function(x) {
   x <- ScaleData(x, features = features, verbose = FALSE)
   x <- RunPCA(x, features = features, verbose = FALSE)})
-
 # integrate
 cmi.anchors <- FindIntegrationAnchors(object.list = cmi.list, anchor.features = features, reduction = "rpca")
 cmi_int <- IntegrateData(anchorset = cmi.anchors)
@@ -253,7 +240,6 @@ co_markers$geneSymbol <- rownames(co_markers)
 # ...dot plot for representative upregulated markers - figures_paper.R
 
 # run gsea on these markers ----
-
 # load refernce files 
 Reactome <- fgsea::gmtPathways("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Reference_gmt_files/c2.cp.reactome.v2023.1.Hs.symbols.gmt")
 hallmark <- fgsea::gmtPathways("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Reference_gmt_files/h.all.v2023.1.Hs.symbols.gmt")
@@ -270,11 +256,13 @@ gsea_co <- fgsea(pathways = KEGG, stats = fold_changes, eps = 0.0, minSize=15, m
 # ...gsea dot plot - figures_paper.R
 
 # emt scoring ----
+#load emt genes
 EMT_genes <- read.gmt("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTicA/Reference_gmt_files/HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION.v2023.2.Hs.gmt")
 
-# subset object to ex vivo only, since emt was found upregulated in co vs mono
+# subset object to ex vivo only, since emt was found upregulated in co vs mono (remove in vivo)
 Idents(cmi_int) <- "condition"
 cmi_int_exvivo <- subset(x = cmi_int, idents = c("co", "mono"))
+# add the emt expression score per cell based on the emt genes
 EMT_score_cmi_int <- AddModuleScore(object = cmi_int_exvivo, features = EMT_genes,  name = 'EMT_Features_cmi')
 FeaturePlot(EMT_score_cmi_int, features = "EMT_Features_cmi1", cols = c("lightgray", "#BE2641"), min.cutoff = 0, max.cutoff = 0.3) + ggtitle("EMT signature")
 
@@ -287,10 +275,11 @@ EMT_score_cmi_int_co$subtype2[grepl("^CO1|^CO2", EMT_score_cmi_int_co$orig.ident
 EMT_score_cmi_int_co$subtype2[grepl("^CO3|^CO4", EMT_score_cmi_int_co$orig.ident)] <- "B-ALL"
 EMT_score_cmi_int_co$subtype2[grepl("^CO5|^CO6", EMT_score_cmi_int_co$orig.ident)] <- "T-ALL"
 
+# divide into subtype 
 Idents(EMT_score_cmi_int_co) <- "subtype2"
 EMT_score_cmi_int_co_B <- subset(x = EMT_score_cmi_int_co, idents = "B-ALL")
 EMT_score_cmi_int_co_T <- subset(x = EMT_score_cmi_int_co, idents = "T-ALL")
-
+# calculate percentage of positive emt cells
 positive_cellsB <- which(EMT_score_cmi_int_co_B@meta.data$EMT_Features_cmi > 0)
 percentage_positiveB <- length(positive_cellsB) / nrow(EMT_score_cmi_int_co_B@meta.data) * 100
 
@@ -303,6 +292,7 @@ percentage_positiveT <- length(positive_cellsT) / nrow(EMT_score_cmi_int_co_T@me
 # saveRDS(EMT_score_cmi_int_co, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/EMT_score_cmi_int_co.rds")
 
 # cycling vs non cycling cells ----
+# caclulate how many cells are cycling and non cycling
 Cycling <- WhichCells(cmi_int, expression = S.Score > 0 | G2M.Score > 0)
 nonCycling <- WhichCells(cmi_int, expression = S.Score <= 0 & G2M.Score <= 0)
 cmi_int$Cycling_prop <- ifelse(colnames(cmi_int) %in% Cycling, "Cycling", "Non-cycling")
