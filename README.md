@@ -13,7 +13,7 @@ The procesing and integration and downstream analysis of the leukemic PDX data c
 
 The processing and downstream analysis of the mesenchymal stromal and endothelial cells can be found in the supporing_cells_paper.R
 
-The graphs for the figures were created with the code found in [figures_paper.R]([url](https://github.com/mkanari/scRNAseq_analysis/blob/b5ee7778aeaca6fc446d70967c4ce65cea1f90a6/figures_paper.R))
+The graphs for the figures were created with the code found in [figures_paper.R]([[url](https://github.com/mkanari/scRNAseq_analysis/blob/b5ee7778aeaca6fc446d70967c4ce65cea1f90a6/figures_paper.R)]
 
 The graphs for the supplementary figures were created with the code found in suppl_figures_paper.R
 
