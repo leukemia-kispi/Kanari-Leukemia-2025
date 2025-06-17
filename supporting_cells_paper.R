@@ -10,13 +10,13 @@ library(ragg)
 library(qusage)
 
 ## create seurat object of all supporting cells - samples: MSC, HUVEC, MSC_HUVEC, CO1, CO2, CO3, CO4, CO5, CO6 ----
-dirs1 <- list.dirs("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/ECTICA_scRNAseq/Controls/", recursive = FALSE, full.names = FALSE)
-dirs2 <- list.dirs("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/ECTICA_scRNAseq/Leukemic/co/", recursive = FALSE, full.names = FALSE)
+dirs1 <- list.dirs("~/Controls/", recursive = FALSE, full.names = FALSE)
+dirs2 <- list.dirs("~/co/", recursive = FALSE, full.names = FALSE)
 
 # controls
 for(name in dirs1){
   
-  cts1 <- Read10X(data.dir = paste0("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/ECTICA_scRNAseq/Controls/", name, "/"))
+  cts1 <- Read10X(data.dir = paste0("~/Controls/", name, "/"))
   
   assign(name, CreateSeuratObject(counts = cts1, 
                                   min.cells = 3, 
@@ -26,7 +26,7 @@ rm("2d", "cts1", dirs1)
 # cocultures
 for(name in dirs2){
   
-  cts2 <- Read10X(data.dir = paste0("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/ECTICA_scRNAseq/Leukemic/co/", name, "/"))
+  cts2 <- Read10X(data.dir = paste0("~/co/", name, "/"))
   
   assign(name, CreateSeuratObject(counts = cts2, 
                                   min.cells = 3, 
@@ -100,8 +100,6 @@ sup_cells_MSCHUVEC <- FindClusters(sup_cells_MSCHUVEC, resolution = 0.3)
 sup_cells_MSCHUVEC <- RunUMAP(sup_cells_MSCHUVEC, dims = 1:20)
 DimPlot(sup_cells_MSCHUVEC, reduction = "umap", label = TRUE)
 
-# saveRDS(sup_cells_MSCHUVEC, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Supporting_Cells/Combined_MSCHUVEC/sup_cells_MSCHUVECg.rds")
-
 ## divide into MSCs and HUVECs ----
 FeaturePlot(sup_cells_MSCHUVEC, features = c("LEPR", "NES", "CXCL12", "PDGFRB", "CDH5", "PECAM1"))
 DimPlot(sup_cells_MSCHUVEC, group.by = 'RNA_snn_res.0.1', label = TRUE)
@@ -139,8 +137,6 @@ sup_cells_MSC_CDH5negCD19neg <- FindClusters(sup_cells_MSC_CDH5negCD19neg, resol
 sup_cells_MSC_CDH5negCD19neg <- RunUMAP(sup_cells_MSC_CDH5negCD19neg, dims = 1:20)
 DimPlot(sup_cells_MSC_CDH5negCD19neg, reduction = 'umap', label = TRUE, group.by = "orig.ident")
 
-# saveRDS(sup_cells_MSC_CDH5negCD19neg, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Supporting_Cells/Combined_MSCHUVEC/Subset_from_MSCHUVEC/CDH5negCD19neg_MSCs_FINAL_USED/sup_cells_MSC_CDH5negCD19neg.rds")
-
 # Select HUVECs
 sup_cells_HUVEC <- subset(x = sup_cells_MSCHUVEC, idents = c(5, 8))
 sup_cells_HUVEC <- NormalizeData(sup_cells_HUVEC)
@@ -151,8 +147,6 @@ sup_cells_HUVEC <- FindNeighbors(sup_cells_HUVEC, dims = 1:20)
 sup_cells_HUVEC <- FindClusters(sup_cells_HUVEC, resolution = 0.3)
 sup_cells_HUVEC <- RunUMAP(sup_cells_HUVEC, dims = 1:20)
 DimPlot(sup_cells_HUVEC, reduction = "umap", label = TRUE, group.by = "orig.ident")
-
-# saveRDS(sup_cells_HUVEC, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Supporting_Cells/Combined_MSCHUVEC/Subset_from_MSCHUVEC/HUVEC_condition_comparison_FINAL_USED/sup_cells_HUVEC.rds")
 
 ## Find markers for HUVECs ----
 Idents(sup_cells_HUVEC) <- "orig.ident"
