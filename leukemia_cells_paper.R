@@ -13,22 +13,22 @@ library(DoubletFinder)
 library(fgsea)
 
 ## create seurat objects for all samples ----
-dirs1 <- list.dirs("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/ECTICA_scRNAseq/Leukemic/co/", recursive = FALSE, full.names = FALSE)
-dirs2 <- list.dirs("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/ECTICA_scRNAseq/Leukemic/mono/", recursive = FALSE, full.names = FALSE)
-dirs3 <- list.dirs("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/in_vivo/", recursive = FALSE, full.names = FALSE)
+dirs1 <- list.dirs("~/co/", recursive = FALSE, full.names = FALSE)
+dirs2 <- list.dirs("~/mono/", recursive = FALSE, full.names = FALSE)
+dirs3 <- list.dirs("~/in_vivo/", recursive = FALSE, full.names = FALSE)
 
 for(name in dirs1){
-  cts1 <- Read10X(data.dir = paste0("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/ECTICA_scRNAseq/Leukemic/co/", name, "/"))
+  cts1 <- Read10X(data.dir = paste0("~/co/", name, "/"))
   assign(name, CreateSeuratObject(counts = cts1, 
                                   min.cells = 3, 
                                   min.features = 200))}
 for(name in dirs2){
-  cts2 <- Read10X(data.dir = paste0("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/ECTICA_scRNAseq/Leukemic/mono/", name, "/"))
+  cts2 <- Read10X(data.dir = paste0("~/mono/", name, "/"))
   assign(name, CreateSeuratObject(counts = cts2, 
                                   min.cells = 3, 
                                   min.features = 200))}
 for(name in dirs3){
-  cts3 <- Read10X(data.dir = paste0("~/kispi/Research/12_Sequencing_raw/MagdaliniKanari/in_vivo/", name, "/"))
+  cts3 <- Read10X(data.dir = paste0("~/in_vivo/", name, "/"))
   assign(name, CreateSeuratObject(counts = cts3[["Gene Expression"]], 
                                   min.cells = 3, 
                                   min.features = 200))}
@@ -104,19 +104,15 @@ for (object_name in seurat_objects) {
 ## merge seurat objects based on condition ----
 mono <- merge(MONO1, y = c(MONO2, MONO3, MONO4, MONO5, MONO6), 
               add.cell.ids = c("MONO1", "MONO2", "MONO3", "MONO4", "MONO5", "MONO6"), project = "mono")
-# saveRDS(mono, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Doublets_excluded/rds.files/mono.rds")
 
 co <- merge(CO1, y = c(CO2, CO3, CO4, CO5, CO6), 
             add.cell.ids = c("CO1", "CO2", "CO3", "CO4", "CO5", "CO6"), project = "co")
-# saveRDS(co, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Doublets_excluded/rds.files/co.rds")
 
 invivo<- merge(IN_VIVO1, y = c(IN_VIVO2, IN_VIVO3, IN_VIVO4, IN_VIVO5, IN_VIVO6), 
                add.cell.ids = c("invivo1", "invivo2", "invivo3", 'invivo4', "invivo5", "invivo6"), project = "invivo")
-# saveRDS(invivo, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono/co_mono_invivo(cmi)/invivo.rds")
 
 # merge ex vivo data together to remove any supporting cells from co-culture----
 co_mono <- merge(co, y = mono, add.cell.ids = c("co", "mono"), project = "co_mono")
-# saveRDS(co_mono, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Doublets_excluded/rds.files/co_mono.rds")
 
 # run standard pipeline 
 co_mono <- NormalizeData(co_mono, normalization.method = "LogNormalize", scale.factor = 10000)
@@ -143,7 +139,6 @@ co_mono_Leu <- FindClusters(co_mono_Leu, resolution = 0.3)
 set.seed(42)
 co_mono_Leu <- RunUMAP(co_mono_Leu, dims = 1:20)
 DimPlot(co_mono_Leu, reduction = "umap", group.by = "orig.ident", label = TRUE)
-# saveRDS(co_mono_Leu, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Doublets_excluded/rds.files/co_mono_Leu.rds")
 
 # subset datasets based on subtype ----
 # this step was performed to look into subtype-based signatures, and to account for subtype variability downstream
@@ -152,18 +147,10 @@ co_mono_Leu_HLF <- subset(x = co_mono_Leu, idents = c("CO1", "CO2", "MONO1", "MO
 co_mono_Leu_PBX1 <- subset(x = co_mono_Leu, idents = c("CO3", "CO4", "MONO3", "MONO4"))
 co_mono_Leu_T<- subset(x = co_mono_Leu, idents = c("CO5", "CO6", "MONO5", "MONO6"))
 
-# saveRDS(co_mono_Leu_HLF, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono/co_mono_subtype/co_mono_Leu_HLF.rds")
-# saveRDS(co_mono_Leu_PBX1, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono/co_mono_subtype/co_mono_Leu_PBX1.rds")
-# saveRDS(co_mono_Leu_T, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono/co_mono_subtype/co_mono_Leu_T.rds")
-
 Idents(invivo)<- "orig.ident"
 invivo_HLF <- subset(x = invivo, idents = c("IN_VIVO1", "IN_VIVO2"))
 invivo_PBX1 <- subset(x = invivo, idents = c("IN_VIVO3", "IN_VIVO4"))
 invivo_T<- subset(x = invivo, idents = c("IN_VIVO5", "IN_VIVO6"))
-
-# saveRDS(invivo_HLF, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/invivo_d0/invivo_HLF.rds")
-# saveRDS(invivo_PBX1, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/invivo_d0/invivo_PBX1.rds")
-# saveRDS(invivo_T, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/invivo_d0/invivo_T.rds")
 
 # process all new datasets with standard pipeline
 seurat_objects_new <- c("co_mono_Leu_HLF","co_mono_Leu_PBX1", "co_mono_Leu_T", "invivo_HLF", "invivo_PBX1", "invivo_T")
@@ -193,8 +180,6 @@ cmi <- FindClusters(cmi, resolution = 0.1)
 set.seed(42)
 cmi <- RunUMAP(cmi, dims = 1:20)
 DimPlot(cmi, reduction = "umap", group.by = 'orig.ident', label = FALSE)
-
-# saveRDS(cmi, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_int_final_used/cmi.rds")
 
 ## data integration based on experiment ---- 
 # create column defining ex vivo and in vivo(check if identities co, mono, invivo are correct)
@@ -226,8 +211,6 @@ cmi_int <- FindNeighbors(cmi_int, reduction = "pca", dims = 1:30)
 cmi_int <- FindClusters(cmi_int, resolution = 0.2)
 DimPlot(cmi_int, reduction = "umap", group.by = c("Phase", "condition")) + ggtitle("cmi_int")
 
-# saveRDS(cmi_int, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_int_final_used/cmi_int.rds")
-
 ## downstream analysis on RNA ----
 DefaultAssay(cmi_int) <- "RNA"
 Idents(cmi_int) <- "condition"
@@ -235,29 +218,27 @@ Idents(cmi_int) <- "condition"
 # up- and down-regulated genes comparing mono- and co-culture ----
 co_markers <-FindMarkers(cmi_int, ident.1 = "co", ident.2 = "mono", subset.ident = 'condition')
 co_markers$geneSymbol <- rownames(co_markers)
-# saveRDS(co_markers, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_final_used/co_markers.rds")
 
 # ...dot plot for representative upregulated markers - figures_paper.R
 
 # run gsea on these markers ----
 # load refernce files 
-Reactome <- fgsea::gmtPathways("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Reference_gmt_files/c2.cp.reactome.v2023.1.Hs.symbols.gmt")
-hallmark <- fgsea::gmtPathways("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Reference_gmt_files/h.all.v2023.1.Hs.symbols.gmt")
-KEGG <- fgsea::gmtPathways("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Reference_gmt_files/c2.cp.kegg.v2023.1.Hs.symbols.gmt")
-GO <- fgsea::gmtPathways("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Reference_gmt_files/c5.all.v2023.1.Hs.symbols.gmt")
+Reactome <- fgsea::gmtPathways("~/c2.cp.reactome.v2023.1.Hs.symbols.gmt")
+hallmark <- fgsea::gmtPathways("~/h.all.v2023.1.Hs.symbols.gmt")
+KEGG <- fgsea::gmtPathways("~/c2.cp.kegg.v2023.1.Hs.symbols.gmt")
+GO <- fgsea::gmtPathways("~/c5.all.v2023.1.Hs.symbols.gmt")
 
 # run the gsea
 co_markers <- co_markers %>% arrange(desc(avg_log2FC))
 fold_changes <- co_markers$avg_log2FC
 names(fold_changes) <- co_markers$geneSymbol
 gsea_co <- fgsea(pathways = KEGG, stats = fold_changes, eps = 0.0, minSize=15, maxSize=500)
-# saveRDS(gsea_co, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_final_used/gsea.co.rds")
 
 # ...gsea dot plot - figures_paper.R
 
 # emt scoring ----
 #load emt genes
-EMT_genes <- read.gmt("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTicA/Reference_gmt_files/HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION.v2023.2.Hs.gmt")
+EMT_genes <- read.gmt("~/HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION.v2023.2.Hs.gmt")
 
 # subset object to ex vivo only, since emt was found upregulated in co vs mono (remove in vivo)
 Idents(cmi_int) <- "condition"
@@ -287,9 +268,6 @@ positive_cellsT <- which(EMT_score_cmi_int_co_T@meta.data$EMT_Features_cmi > 0)
 percentage_positiveT <- length(positive_cellsT) / nrow(EMT_score_cmi_int_co_T@meta.data) * 100
 
 # ... plot violin plot - figures_paper.R
-
-# saveRDS(cmi_int_exvivo, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/cmi_int_exvivo.rds")
-# saveRDS(EMT_score_cmi_int_co, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/EMT_score_cmi_int_co.rds")
 
 # cycling vs non cycling cells ----
 # caclulate how many cells are cycling and non cycling
