@@ -1,5 +1,5 @@
 # Kanari et al. Leukemia 2025
-This repository contains code and links to raw data used for: *A three-dimensional ex vivo model recapitulates in vivo features and drug resistance phenotypes in childhood acute lymphoblastic leukemia*
+This repository contains code and links to raw data used for: *A three-dimensional ex vivo model recapitulates in vivo features and drug resistance phenotypes in childhood acute lymphoblastic leukemia.*
 
 # Dataset composition
 1. The 3D data include leukemic, endothelial and mesenchymal stromal cells cultured in the Ectica plates available at:
