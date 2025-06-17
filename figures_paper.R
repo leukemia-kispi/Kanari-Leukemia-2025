@@ -10,7 +10,7 @@ library(dplyr)
 library(paletteer)
 
 ## Figure 4 - HUVECs ----
-sup_cells_HUVEC <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Supporting_Cells/Combined_MSCHUVEC/Subset_from_MSCHUVEC/HUVEC_condition_comparison_FINAL_USED/sup_cells_HUVEC.rds")
+sup_cells_HUVEC <- readRDS("~/sup_cells_HUVEC.rds")
 
 # create columns for samples
 sup_cells_HUVEC$condition <- NA
@@ -73,8 +73,8 @@ ggplot(id_composition, aes(x = factor(Var1, levels = c("HUVEC only", "HUVEC vasc
         plot.title = element_text(hjust = 0, size = 16, face = "bold", color = "black"))
 
 # load marker files (see find markers in supporting_cells_paper.R)
-sup_cells_HUVEC_3 <- readRDS ("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Supporting_Cells/Combined_MSCHUVEC/Subset_from_MSCHUVEC/HUVEC_condition_comparison_FINAL_USED/sup_cells_HUVEC_3.rds")
-Reactome <- fgsea::gmtPathways("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Reference_gmt_files/c2.cp.reactome.v2023.1.Hs.symbols.gmt")
+sup_cells_HUVEC_3 <- readRDS ("~/sup_cells_HUVEC_3.rds")
+Reactome <- fgsea::gmtPathways("~/c2.cp.reactome.v2023.1.Hs.symbols.gmt")
 
 sup_cells_HUVEC_3$geneSymbol <- rownames(sup_cells_HUVEC_3)
 sup_cells_HUVEC_3 <- sup_cells_HUVEC_3 %>% arrange(desc(avg_log2FC))
@@ -101,7 +101,7 @@ ggplot(path_3, aes(x = pathway, y = NES, fill = -log10(padj))) +
         plot.title = element_text(hjust = 0.5, size = 16, face = "bold", color = "black")) +   coord_flip()
 
 ## Figure 3 - MSCs ----
-sup_cells_MSC_CDH5negCD19neg <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Supporting_Cells/Combined_MSCHUVEC/Subset_from_MSCHUVEC/CDH5negCD19neg_MSCs_FINAL_USED/sup_cells_MSC_CDH5negCD19neg.rds")
+sup_cells_MSC_CDH5negCD19neg <- readRDS("~/sup_cells_MSC_CDH5negCD19neg.rds")
 
 # create columns for samples
 sup_cells_MSC_CDH5negCD19neg$condition <- NA
@@ -172,13 +172,13 @@ ggplot(id_composition_filtered, aes(x = 1, y = Percentage, fill = Var2)) +
     plot.title = element_text(hjust = 0.5, vjust = -2, size = 24, face = "bold"))
 
 # gsea
-sup_cells_MSC_CDH5negCD19neg_markers_all <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Supporting_Cells/Combined_MSCHUVEC/Subset_from_MSCHUVEC/CDH5negCD19neg_MSCs_FINAL_USED/sup_cells_MSC_CDH5negCD19neg_markers_all.rds")
+sup_cells_MSC_CDH5negCD19neg_markers_all <- readRDS("~/sup_cells_MSC_CDH5negCD19neg_markers_all.rds")
 sup_cells_MSC_CDH5negCD19neg_markers_all <- sup_cells_MSC_CDH5negCD19neg_markers_all %>% arrange(desc(avg_log2FC))
 fold_changes <- sup_cells_MSC_CDH5negCD19neg_markers_all$avg_log2FC
 sup_cells_MSC_CDH5negCD19neg_markers_all$geneSymbol <-rownames(sup_cells_MSC_CDH5negCD19neg_markers_all)
 names(fold_changes) <- sup_cells_MSC_CDH5negCD19neg_markers_all$geneSymbol
 
-GO <- fgsea::gmtPathways("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Reference_gmt_files/c5.all.v2023.1.Hs.symbols.gmt")
+GO <- fgsea::gmtPathways("~/c5.all.v2023.1.Hs.symbols.gmt")
 gsea_all <- fgsea(pathways = GO, stats = fold_changes, eps = 0.0, minSize=15, maxSize=500)
 
 ### Extract the pathways 
@@ -197,8 +197,8 @@ ggplot(top_pathways1, aes(x = reorder(pathway, NES), y = NES, fill = -log10(padj
         axis.title.x = element_text(color = "black", face = "bold")) + coord_flip()
 
 ## Figure 5 - ALLs ----
-cmi <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/cmi.rds")
-cmi_int <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/cmi_int.rds")
+cmi <- readRDS("~/cmi.rds")
+cmi_int <- readRDS("~/cmi_int.rds")
 
 # create columns for samples 
 cmi$condition <- NA
@@ -221,7 +221,7 @@ DimPlot(cmi_int, group.by = "condition",cols =c("#BE2641", "#cc6e77", "#dab5ad")
 DimPlot(cmi_int, group.by = "subtype", cols =c("#BE2641", "#cc6e77", "#dab5ad"), pt.size = 0.12) + ggtitle ("Subtype") + theme(element_text(size = 16, face = "bold"))
 
 # dot plots for representative upregulated markers 
-co_markers <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/co_markers.rds")
+co_markers <- readRDS("~/co_markers.rds")
 
 DefaultAssay(cmi_int) <- "RNA"
 invivo_markers_B <- c("VPREB1", "TCF4", "MEF2C", "PAX5", "EBF1", "MZB1", "CD52", "MGMT", "AUTS2")
@@ -256,7 +256,7 @@ DotPlot(cmi_int_T, features = invivo_markers_data$geneSymbol, dot.min = 0, dot.s
   ggtitle("Leukemia associated genes - T-ALL") +  coord_flip()
 
 # GSEA dot plot
-gsea_co <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/gsea_co.rds")
+gsea_co <- readRDS("~/gsea_co.rds")
 
 top_upregulated_pathways <- gsea_co[order(-gsea_co$NES), ][1:10 ]
 top_upregulated_pathways$pathway <- gsub("^HALLMARK_", "", top_upregulated_pathways$pathway)
@@ -274,7 +274,7 @@ ggplot(top_upregulated_pathways, aes(x = NES, y = reorder(pathway, NES), fill = 
         axis.title.x =  element_text(size = 10, color = "black", face = "bold"))
 
 # emt scoring based on subtype - vln plot
-EMT_score_cmi_int_co <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/EMT_score_cmi_int_co.rds")
+EMT_score_cmi_int_co <- readRDS("~/EMT_score_cmi_int_co.rds")
 
 EMT_score_cmi_int_co$subtype2 <- NA
 EMT_score_cmi_int_co$subtype2[grepl("^CO1|^CO2", EMT_score_cmi_int_co$orig.ident)] <- "B-ALL"
@@ -330,7 +330,7 @@ fold_changes <- cmi_np$avg_log2FC
 names(fold_changes) <- cmi_np$geneSymbol
 
 # run the GSEA
-hallmark <- fgsea::gmtPathways("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Reference_gmt_files/h.all.v2023.1.Hs.symbols.gmt")
+hallmark <- fgsea::gmtPathways("~/h.all.v2023.1.Hs.symbols.gmt")
 gsea_cmi_np <- fgsea(pathways = hallmark, stats = fold_changes, eps = 0.0, minSize=15, maxSize=500)
 
 plotEnrichment(hallmark[["HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION"]], fold_changes) + 
