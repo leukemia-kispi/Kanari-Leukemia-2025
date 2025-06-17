@@ -11,7 +11,7 @@ library(CellChat)
 library(qusage)
 
 ## suppl. figure 2 ----
-sup_cells_MSC_CDH5negCD19neg <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Supporting_Cells/Combined_MSCHUVEC/Subset_from_MSCHUVEC/CDH5negCD19neg_MSCs_FINAL_USED/sup_cells_MSC_CDH5negCD19neg.rds")
+sup_cells_MSC_CDH5negCD19neg <- readRDS("~/sup_cells_MSC_CDH5negCD19neg.rds")
 
 # marker dot plot
 dp <- DotPlot(sup_cells_MSC_CDH5negCD19neg, features = c("PDGFRA", "PDGFRB", "CXCL12", "LEPR", "DCN", "FAP", "CCN2", 
@@ -78,10 +78,10 @@ ggplot(top_pathways1, aes(x = reorder(pathway, NES), y = NES, fill = -log10(padj
   theme(axis.text.x = element_text(angle = 45, hjust = 0)) + coord_flip()
 
 # huvecs
-sup_cells_HUVEC <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Supporting_Cells/Combined_MSCHUVEC/Subset_from_MSCHUVEC/HUVEC_condition_comparison_FINAL_USED/sup_cells_HUVEC.rds")
-sup_cells_HUVEC_1 <- readRDS ("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Supporting_Cells/Combined_MSCHUVEC/Subset_from_MSCHUVEC/HUVEC_condition_comparison_FINAL_USED/sup_cells_HUVEC_1.rds")
+sup_cells_HUVEC <- readRDS("~/sup_cells_HUVEC.rds")
+sup_cells_HUVEC_1 <- readRDS ("~/sup_cells_HUVEC_1.rds")
 
-Reactome <- fgsea::gmtPathways("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Reference_gmt_files/c2.cp.reactome.v2023.1.Hs.symbols.gmt")
+Reactome <- fgsea::gmtPathways("~/c2.cp.reactome.v2023.1.Hs.symbols.gmt")
 
 sup_cells_HUVEC_1$geneSymbol <- rownames(sup_cells_HUVEC_1)
 sup_cells_HUVEC_1 <- sup_cells_HUVEC_1 %>% arrange(desc(avg_log2FC))
@@ -103,7 +103,7 @@ ggplot(path_1, aes(x = pathway, y = NES, fill = -log10(padj))) +
         plot.title = element_text(hjust = 0.5, size = 14, face = "bold", color = "black")) +   coord_flip()
 
 # cellchat
-co <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/1.co/co.rds")
+co <- readRDS("~/co.rds")
   
 # set identities for 3 cell types 
 DimPlot(co, reduction = "umap", label = TRUE)
@@ -171,11 +171,9 @@ dev.off()
 netVisual_chord_gene(cellChat, sources.use = 3, targets.use = 1, lab.cex = 0.5, legend.pos.y = 30, 
                      color.use =  c("#be2641", "#7da47d", "#598fe9"))
 
-# saveRDS(cellChat, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/cellChat_T.rds")
-
 ## suppl. figure 3 ----
-cmi <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/cmi.rds")
-cmi_int <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/cmi_int.rds")
+cmi <- readRDS("~/cmi.rds")
+cmi_int <- readRDS("~/cmi_int.rds")
 
 DimPlot(cmi, group.by = "condition", cols =c("#BE2641", "#edc48e", "#e18a67")) + ggtitle("Before integration")  
 
@@ -204,7 +202,7 @@ ggplot(co_up_markers, aes(x = pct.1, y = avg_log2FC)) +
   theme(plot.title = element_text(face = "bold", size = 16, hjust = 0.4))
 
 # emt regulatory pathways
-gsea_co <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/gsea_co.rds")
+gsea_co <- readRDS("~/gsea_co.rds")
 
 pathways_of_interest <- c("HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION", 
                           "HALLMARK_WNT_BETA_CATENIN_SIGNALING", "HALLMARK_HEDGEHOG_SIGNALING", 
@@ -234,7 +232,7 @@ Idents(cmi_int_exvivo) <- "subtype"
 cmi_int_exvivoB <- subset(cmi_int_exvivo, idents = c("B-ALL"))
 cmi_int_exvivoT <- subset(cmi_int_exvivo, idents = c("T-ALL"))
 
-hallmark <- fgsea::gmtPathways("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Reference_gmt_files/h.all.v2023.1.Hs.symbols.gmt")
+hallmark <- fgsea::gmtPathways("~/h.all.v2023.1.Hs.symbols.gmt")
 objects <- c("cmi_int_exvivoB", "cmi_int_exvivoT")
 
 for (object_name in objects) {
@@ -258,9 +256,6 @@ for (object_name in objects) {
          x = "Hallmarks", y = "Normalized Enrichment Score") +
     theme_minimal() + theme(plot.title = element_text(hjust = 1, size = 10)) + coord_flip()}
 
-# saveRDS(cmi_int_exvivoB, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/cmi_int_exvivoB.rds")
-# saveRDS(cmi_int_exvivoT, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/cmi_int_exvivoT.rds")
-
 # umap - cycling, non-cycling 
 # define high-cycling vs low-cycling cells
 Cycling <- WhichCells(cmi_int, expression = S.Score > 0 | G2M.Score > 0)
@@ -281,9 +276,6 @@ cmi_np <- cmi_np %>% arrange(desc(avg_log2FC))
 fold_changes <- cmi_np$avg_log2FC
 names(fold_changes) <- cmi_np$geneSymbol
 gsea_cmi_np <- fgsea(pathways = hallmark, stats = fold_changes, eps = 0.0, minSize=15, maxSize=500)
-
-# saveRDS(cmi_np, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/cmi_np.rds")
-# saveRDS(gsea_cmi_np, "~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/gsea_cmi_np.rds")
 
 plotEnrichment(hallmark[["HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION"]], fold_changes) + 
   labs(title="HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION", subtitle = "Upregulation in non cycling vs cycling cells")
