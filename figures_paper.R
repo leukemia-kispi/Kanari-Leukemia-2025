@@ -9,7 +9,7 @@ library(ggplot2)
 library(dplyr)
 library(paletteer)
 
-## HUVECs ----
+## Figure 4 - HUVECs ----
 sup_cells_HUVEC <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Supporting_Cells/Combined_MSCHUVEC/Subset_from_MSCHUVEC/HUVEC_condition_comparison_FINAL_USED/sup_cells_HUVEC.rds")
 
 # create columns for samples
@@ -100,7 +100,7 @@ ggplot(path_3, aes(x = pathway, y = NES, fill = -log10(padj))) +
         axis.title.x = element_text(size = 12, face = "bold", color = "black"),
         plot.title = element_text(hjust = 0.5, size = 16, face = "bold", color = "black")) +   coord_flip()
 
-## MSCs ----
+## Figure 3 - MSCs ----
 sup_cells_MSC_CDH5negCD19neg <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Supporting_Cells/Combined_MSCHUVEC/Subset_from_MSCHUVEC/CDH5negCD19neg_MSCs_FINAL_USED/sup_cells_MSC_CDH5negCD19neg.rds")
 
 # create columns for samples
@@ -196,7 +196,7 @@ ggplot(top_pathways1, aes(x = reorder(pathway, NES), y = NES, fill = -log10(padj
         plot.title = element_text(hjust = 1.5, color = "black", face = "bold", size = 14),
         axis.title.x = element_text(color = "black", face = "bold")) + coord_flip()
 
-## ALLs ----
+## Figure 5 - ALLs ----
 cmi <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/cmi.rds")
 cmi_int <- readRDS("~/kispi/Research/13_Sequencing_analysis/MagdaliniKanari/Magda_scRNA_ECTICA/Analysis/Leukemia_Doublets_excluded/BASIC_PIPELINE_merged_co_mono_invivo/7.co_mono_invivo(cmi)/cmi_FINAL_USED/cmi_int.rds")
 
